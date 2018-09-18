@@ -40,7 +40,7 @@ var getCSV = function(url) {
 
 var pages = []
 var text = 'http://www.pnas.org/search/pubyear%3A2010%20numresults%3A100%20sort%3Arelevance-rank%20format_result%3Acondensed%20content_type%3Ajournal?page='
-for (let i=0; i<2; i++) {
+for (let i=0; i<40; i++) {
     pages.push(text+i.toString());
 }
 let scrapers = pages.map(getCSV);
