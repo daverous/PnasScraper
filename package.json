@@ -1,0 +1,17 @@
+{
+  "name": "forali",
+  "version": "1.0.0",
+  "description": "A simple project to scrape PNAS for some hopefully useful data",
+  "main": "runner.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "nvm": "~/.nvm/nvm-exec which node | xargs -J % ln -sf % ./.nvm-node && chmod +x ./.nvm-node",
+    "start": "node runner.js"
+  },
+  "author": "David Wilson",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "request": "^2.88.0"
+  }
+}
