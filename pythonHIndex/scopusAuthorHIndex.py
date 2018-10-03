@@ -38,7 +38,7 @@ def test(x):
     title =  title.encode("ascii", errors="ignore").decode()
     print(title)
     try:
-        eid = ScopusSearch('TITLE (' +title+')', refresh=True)
+        eid = ScopusSearch('TITLE (' +title+')',count=1, refresh=False)
         
         if (len(eid.EIDS)>0):
             abs = ScopusAbstract(eid.EIDS[0], view='FULL')
@@ -52,7 +52,7 @@ def test(x):
             
             if (au):
                 hIndex = au.hindex
-                impact = au.author_impact_factor(year=2010, refresh=True)
+                impact = au.author_impact_factor(year=2010, refresh=False)
     except HTTPError:
         print("ERROR - ")
         print("title" + title)
