@@ -34,23 +34,28 @@ def test(x):
     title = title.replace(')',' ')
     title = title.replace('/',' ')
     title = title.replace('\',' ')
+    title = title.replace(';',' ')
     title =  title.encode("ascii", errors="ignore").decode()
     print(title)
-    eid = ScopusSearch('TITLE (' +title+')', refresh=True)
-    
-    if (len(eid.EIDS)>0):
-        abs = ScopusAbstract(eid.EIDS[0], view='FULL')
-
-        firstAuthorId = ""
-        if (abs):
-            if (len(abs.authors)>0):
-                firstAuthorId = abs.authors[0].auid
-        au = ScopusAuthor(firstAuthorId)
-        # y = au.author_impact_factor(year=2010, refresh=True)
+    try:
+        eid = ScopusSearch('TITLE (' +title+')', refresh=True)
         
-        if (au):
-            hIndex = au.hindex
-            impact = au.author_impact_factor(year=2010, refresh=True)
+        if (len(eid.EIDS)>0):
+            abs = ScopusAbstract(eid.EIDS[0], view='FULL')
+
+            firstAuthorId = ""
+            if (abs):
+                if (len(abs.authors)>0):
+                    firstAuthorId = abs.authors[0].auid
+            au = ScopusAuthor(firstAuthorId)
+            # y = au.author_impact_factor(year=2010, refresh=True)
+            
+            if (au):
+                hIndex = au.hindex
+                impact = au.author_impact_factor(year=2010, refresh=True)
+    except HTTPError:
+        print("ERROR - ")
+        print("title" + title)
     x['hindex'] = hIndex
     x['impact'] = impact
     return x
