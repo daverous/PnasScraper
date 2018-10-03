@@ -32,6 +32,8 @@ def test(x):
     title = title.replace('–',' ')
     title = title.replace('(',' ')
     title = title.replace(')',' ')
+    title = title.replace('/',' ')
+    title = title.replace('\',' ')
     title =  title.encode("ascii", errors="ignore").decode()
     print(title)
     eid = ScopusSearch('TITLE (' +title+')', refresh=True)
