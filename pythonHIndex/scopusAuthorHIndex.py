@@ -3,6 +3,7 @@ import pandas as pd
 # https://scopus.readthedocs.io/en/latest/reference/scopus.ScopusSearch.html?highlight=scopussearch
 from scopus import ScopusSearch
 from scopus import ScopusAbstract
+from time import sleep
 
 data = pd.read_csv('data.csv')
 
@@ -24,44 +25,56 @@ data = pd.read_csv('data.csv')
 
 
 
-def test(x):
+def test(title):
 
-    title = x.title
+    
     hIndex = 0
     impact = 0
-    print(title)
-    title = title.replace('–',' ')
-    title = title.replace('(',' ')
-    title = title.replace(')',' ')
-    title = title.replace('/',' ')
-    title = title.replace('\\',' ')
-    title = title.replace(';',' ')
-    title =  title.encode("ascii", errors="ignore").decode()
-    print(title)
-    try:
-        eid = ScopusSearch('TITLE (' +title+')',count=1, refresh=False)
-        
-        if (len(eid.EIDS)>0):
-            abs = ScopusAbstract(eid.EIDS[0], view='FULL')
-
-            firstAuthorId = ""
-            if (abs):
-                if (len(abs.authors)>0):
-                    firstAuthorId = abs.authors[0].auid
-            au = ScopusAuthor(firstAuthorId)
-            # y = au.author_impact_factor(year=2010, refresh=True)
+    if (title):
+        title = title.replace('–',' ')
+        title = title.replace('(',' ')
+        title = title.replace(')',' ')
+        title = title.replace('/',' ')
+        title = title.replace('\\',' ')
+        title = title.replace(';',' ')
+        title =  title.encode("ascii", errors="ignore").decode()
+       
+        try:
+            eid = ScopusSearch('TITLE (' +title+')',count=1, refresh=False)
             
-            if (au):
-                hIndex = au.hindex
-                impact = au.author_impact_factor(year=2010, refresh=False)
-    except:
-        print("ERROR - ")
-        print("title" + title)
-    x['hindex'] = hIndex
-    x['impact'] = impact
-    return x
+            if (len(eid.EIDS)>0):
+                abs = ScopusAbstract(eid.EIDS[0], view='FULL')
+
+                firstAuthorId = ""
+                if (abs):
+                    if (len(abs.authors)>0):
+                        firstAuthorId = abs.authors[0].auid
+                au = ScopusAuthor(firstAuthorId)
+                # y = au.author_impact_factor(year=2010, refresh=True)
+                
+                if (au):
+                    hIndex = au.hindex
+                    impact = au.author_impact_factor(year=2010, refresh=False)
+                    print("hIndex" + str(hIndex))
+        except:
+            print("ERROR - ")
+            print("title" + title)
+
+    return (hIndex,impact)
 
 
-data.apply(test,axis=1)
+# data.apply(test,axis=1)
 
+hIndexes = []
+impacts = []
+for i,row in data.iterrows():
+    ret = test(row['title'])
+    hIndexes.append(ret[0])
+    impacts.append(ret[1])
+    # data.at[i, 'hindex'] = ret[0]
+    # data.at[i, 'impact'] = ret[1]
+    sleep(1)
+
+data['hIndex'] = hIndexes
+data['impact'] = impacts
 data.to_csv("out.csv")
