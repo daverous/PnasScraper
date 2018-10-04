@@ -5,7 +5,7 @@ from scopus import ScopusSearch
 from scopus import ScopusAbstract
 from time import sleep
 from requests.exceptions import HTTPError
-data = pd.read_csv('data.csv')
+data = pd.read_csv('out.csv')
 
 # eid = ScopusSearch('TITLE (A naturally chimeric type IIA topoisomerase in Aquifex aeolicus highlights an evolutionary path for the emergence of functional paralogs)', refresh=True)
 # abs = ScopusAbstract(eid.EIDS[0], view='FULL')
@@ -27,7 +27,7 @@ def test(title, flag=False):
     
     hIndex = 0
     impact = 0
-    eid = 0
+    eidVal = 0
     firstAuthorId = 0
     if isinstance(title, str):
         title = title.replace('–',' ')
@@ -40,9 +40,9 @@ def test(title, flag=False):
        
         try:
             eid = ScopusSearch('TITLE (' +title+')',count=1, refresh=False)
-            
             if (len(eid.EIDS)>0):
-                abs = ScopusAbstract(eid.EIDS[0], view='FULL')
+                eidVal = eid.EIDS[0]    
+                abs = ScopusAbstract(eidVal, view='FULL')
 
                 firstAuthorId = ""
                 if (abs):
@@ -62,6 +62,9 @@ def test(title, flag=False):
             if (e.__class__.__name__ == "HTTPError"):
                 if (e.response.status_code == 429):
                     print(e.response.headers)
+                    if ('X-RateLimit-Remaining' in e.response.headers):
+                        if (e.response.headers['X-RateLimit-Remaining'] == '0'):
+                            return (hIndex, impact, eidVal, firstAuthorId, False)
                     sleep(20)
                     if (not flag):
                         # avoid infinite loop
@@ -69,7 +72,7 @@ def test(title, flag=False):
     else:
         print("ERROR - " + "title is not string:" + str(title))
     print("title: "+ title + " " + "hIndex: " + str(hIndex))
-    return (hIndex, impact, eid, firstAuthorId)
+    return (hIndex, impact, eidVal, firstAuthorId)
 
 
 # data.apply(test,axis=1)
@@ -78,16 +81,32 @@ hIndexes = []
 impacts = []
 eid = []
 authorEid = []
+flag = False
 for i,row in data.iterrows():
-    if not 'hIndex' in row or row['hIndex'] == 0:
-        ret = test(str(row['title']))
-        hIndexes.append(ret[0])
-        impacts.append(ret[1])
-        eid.append(ret[2])
-        authorEid.append(ret[3])
+
+    if (flag):
+        hIndexes.append("0")
+        impacts.append("0")
+        eid.append("0")
+        authorEid.append("0")
+    else:
+        if not 'hIndex' in row or row['hIndex'] == 0:
+            ret = test(str(row['title']))
+            hIndexes.append(ret[0])
+            impacts.append(ret[1])
+            eid.append(ret[2])
+            authorEid.append(ret[3])
+            # Handle if we've timed out
+            if (len(ret) == 5):
+                flag =True
     # data.at[i, 'hindex'] = ret[0]
     # data.at[i, 'impact'] = ret[1]
-    sleep(1)
+            sleep(1)
+        else:
+            hIndexes.append(row['hIndex'])
+            impacts.append(row['impact'])
+            eid.append(row['eid'])
+            authorEid.append(row['authorEid'])
 
 data['hIndex'] = hIndexes
 data['impact'] = impacts
