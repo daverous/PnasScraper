@@ -4,7 +4,7 @@ import pandas as pd
 from scopus import ScopusSearch
 from scopus import ScopusAbstract
 from time import sleep
-
+from requests.exceptions import HTTPError
 data = pd.read_csv('data.csv')
 
 # eid = ScopusSearch('TITLE (A naturally chimeric type IIA topoisomerase in Aquifex aeolicus highlights an evolutionary path for the emergence of functional paralogs)', refresh=True)
@@ -22,17 +22,14 @@ data = pd.read_csv('data.csv')
 
 
 
-
-
-
-def test(title):
+def test(title, flag=False):
 
     
     hIndex = 0
     impact = 0
     eid = 0
     firstAuthorId = 0
-    if (title):
+    if isinstance(title, str):
         title = title.replace('–',' ')
         title = title.replace('(',' ')
         title = title.replace(')',' ')
@@ -61,7 +58,16 @@ def test(title):
         except Exception as e:
             print("ERROR - " + "title:"+ title)
             print(e)
-
+            print(e.__class__.__name__)
+            if (e.__class__.__name__ == "HTTPError"):
+                if (e.response.status_code == 429):
+                    print(e.response.headers)
+                    sleep(20)
+                    if (not flag):
+                        # avoid infinite loop
+                        return test(title,True)
+    else:
+        print("ERROR - " + "title is not string:" + str(title))
     print("title: "+ title + " " + "hIndex: " + str(hIndex))
     return (hIndex, impact, eid, firstAuthorId)
 
@@ -73,8 +79,8 @@ impacts = []
 eid = []
 authorEid = []
 for i,row in data.iterrows():
-    if (row['hIndex'] == 0):
-        ret = test(row['title'])
+    if not 'hIndex' in row or row['hIndex'] == 0:
+        ret = test(str(row['title']))
         hIndexes.append(ret[0])
         impacts.append(ret[1])
         eid.append(ret[2])
