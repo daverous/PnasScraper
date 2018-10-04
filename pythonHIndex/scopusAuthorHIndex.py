@@ -58,9 +58,9 @@ def test(title):
                     hIndex = au.hindex
                     impact = au.author_impact_factor(year=2010, refresh=False)
                     
-        except:
-            print("ERROR - ")
-            print("title" + title)
+        except Exception as e:
+            print("ERROR - " + "title:"+ title)
+            print(e)
 
     print("title: "+ title + " " + "hIndex: " + str(hIndex))
     return (hIndex, impact, eid, firstAuthorId)
