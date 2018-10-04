@@ -73,11 +73,12 @@ impacts = []
 eid = []
 authorEid = []
 for i,row in data.iterrows():
-    ret = test(row['title'])
-    hIndexes.append(ret[0])
-    impacts.append(ret[1])
-    eid.append(ret[2])
-    authorEid.append(ret[3])
+    if (row['hIndex'] == 0):
+        ret = test(row['title'])
+        hIndexes.append(ret[0])
+        impacts.append(ret[1])
+        eid.append(ret[2])
+        authorEid.append(ret[3])
     # data.at[i, 'hindex'] = ret[0]
     # data.at[i, 'impact'] = ret[1]
     sleep(1)
