@@ -30,6 +30,8 @@ def test(title):
     
     hIndex = 0
     impact = 0
+    eid = 0
+    firstAuthorId = 0
     if (title):
         title = title.replace('–',' ')
         title = title.replace('(',' ')
@@ -61,21 +63,27 @@ def test(title):
             print("title" + title)
 
     print("title: "+ title + " " + "hIndex: " + str(hIndex))
-    return (hIndex,impact)
+    return (hIndex, impact, eid, firstAuthorId)
 
 
 # data.apply(test,axis=1)
 
 hIndexes = []
 impacts = []
+eid = []
+authorEid = []
 for i,row in data.iterrows():
     ret = test(row['title'])
     hIndexes.append(ret[0])
     impacts.append(ret[1])
+    eid.append(ret[2])
+    authorEid.append(ret[3])
     # data.at[i, 'hindex'] = ret[0]
     # data.at[i, 'impact'] = ret[1]
     sleep(1)
 
 data['hIndex'] = hIndexes
 data['impact'] = impacts
+data['eid'] = eid
+data['authorEid'] = authorEid
 data.to_csv("out.csv")
