@@ -55,11 +55,12 @@ def test(title):
                 if (au):
                     hIndex = au.hindex
                     impact = au.author_impact_factor(year=2010, refresh=False)
-                    print("hIndex" + str(hIndex))
+                    
         except:
             print("ERROR - ")
             print("title" + title)
 
+    print("title: "+ title + " " + "hIndex: " + str(hIndex))
     return (hIndex,impact)
 
 
