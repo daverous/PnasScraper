@@ -29,6 +29,7 @@ def test(x):
     title = x.title
     hIndex = 0
     impact = 0
+    print(title)
     title = title.replace('–',' ')
     title = title.replace('(',' ')
     title = title.replace(')',' ')
@@ -53,7 +54,7 @@ def test(x):
             if (au):
                 hIndex = au.hindex
                 impact = au.author_impact_factor(year=2010, refresh=False)
-    except HTTPError:
+    except:
         print("ERROR - ")
         print("title" + title)
     x['hindex'] = hIndex
