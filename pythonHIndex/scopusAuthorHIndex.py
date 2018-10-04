@@ -45,15 +45,24 @@ def test(title, flag=False):
                 abs = ScopusAbstract(eidVal, view='FULL')
 
                 firstAuthorId = ""
+                # Set h index to -1 if GLOBUS API does not have info
                 if (abs):
-                    if (len(abs.authors)>0):
+                    if (len(abs.authors)==0):
+                        hIndex = -1
+                    else:
                         firstAuthorId = abs.authors[0].auid
-                au = ScopusAuthor(firstAuthorId)
-                # y = au.author_impact_factor(year=2010, refresh=True)
-                
-                if (au):
-                    hIndex = au.hindex
-                    impact = au.author_impact_factor(year=2010, refresh=False)
+                    au = ScopusAuthor(firstAuthorId)
+                    # y = au.author_impact_factor(year=2010, refresh=True)
+                    
+                    if (au):
+                        hIndex = au.hindex
+                        impact = au.author_impact_factor(year=2010, refresh=False)
+                    else:
+                        hIndex = -1
+                else:
+                    hIndex = -1
+            else:
+                hIndex = -1
                     
         except Exception as e:
             print("ERROR - " + "title:"+ title)
