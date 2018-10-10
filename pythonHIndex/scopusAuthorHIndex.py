@@ -108,8 +108,6 @@ for i,row in data.iterrows():
             # Handle if we've timed out
             if (len(ret) == 5):
                 flag =True
-    # data.at[i, 'hindex'] = ret[0]
-    # data.at[i, 'impact'] = ret[1]
             sleep(1)
         else:
             hIndexes.append(row['hIndex'])
